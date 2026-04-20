@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { ShoppingCart, Zap, Shield, Package } from 'lucide-react';
+import { ShoppingCart, Zap, Shield, Package, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import Image from 'next/image';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -91,6 +92,16 @@ export default function StorePage() {
 
   return (
     <main className="min-h-screen bg-black">
+      {/* Back to Models button */}
+      <div className="absolute top-8 left-6 md:left-12 lg:left-24 z-50">
+        <Link 
+          href="/" 
+          className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-3 h-3" />
+          Back to Models
+        </Link>
+      </div>
       {/* Hero Banner */}
       <section className="relative flex flex-col items-start justify-center px-6 md:px-12 lg:px-24 pt-24 pb-16">
         <motion.div

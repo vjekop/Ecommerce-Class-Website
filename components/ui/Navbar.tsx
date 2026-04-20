@@ -8,8 +8,6 @@ import { Menu, X } from 'lucide-react';
 
 const navItems = [
     { name: 'Shop', path: '/store' },
-    { name: 'Gallery', path: '#gallery' },
-    { name: 'Custom', path: '/contact' },
 ];
 
 export function Navbar() {

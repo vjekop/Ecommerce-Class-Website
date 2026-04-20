@@ -1,6 +1,6 @@
 'use client';
 
-import { useGLTF, Float, Stage, Center } from '@react-three/drei';
+import { useGLTF, Float, Center } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import * as THREE from 'three';
@@ -9,19 +9,19 @@ export function Model({ path, scale = 1 }: { path: string, scale?: number }) {
     const { scene } = useGLTF(path);
     const modelRef = useRef<THREE.Group>(null);
 
-    // Subtle continuous rotation in addition to the Float component
+    // Very subtle continuous rotation
     useFrame((state) => {
         if (modelRef.current) {
-            modelRef.current.rotation.y += 0.005;
+            modelRef.current.rotation.y += 0.0015;
         }
     });
 
     return (
         <Float 
-            speed={2} 
-            rotationIntensity={0.5} 
-            floatIntensity={0.5} 
-            floatingRange={[-0.1, 0.1]}
+            speed={1.5} 
+            rotationIntensity={0.3} 
+            floatIntensity={0.3} 
+            floatingRange={[-0.05, 0.05]}
         >
             <group ref={modelRef} dispose={null} scale={scale}>
                 <Center top>

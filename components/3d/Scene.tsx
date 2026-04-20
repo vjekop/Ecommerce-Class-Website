@@ -33,7 +33,7 @@ export function Scene({ children }: SceneProps) {
                         minDistance={5}
                         maxDistance={5}
                         autoRotate
-                        autoRotateSpeed={2.0}
+                        autoRotateSpeed={0.5}
                     />
 
                     {children}
