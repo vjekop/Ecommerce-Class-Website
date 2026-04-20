@@ -1,9 +1,11 @@
 import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia',
-});
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-02-24.acacia',
+    })
+  : null;
 
 const products = [
   {
@@ -35,6 +37,10 @@ export async function POST(request: NextRequest) {
 
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe is not configured' }, { status: 500 });
     }
 
     const session = await stripe.checkout.sessions.create({
