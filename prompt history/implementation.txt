@@ -1,0 +1,38 @@
+Implementation Plan - Modern Portfolio Website
+Goal Description
+Build a premium, motion-rich Next.js portfolio website with a focus on typography, subtle animations, and a "no gimmick" modern aesthetic. The site will use Framer Motion for interactions and Tailwind CSS for styling.
+
+User Review Required
+Design Direction: Confirming "Dark Mode" as the default premium look? (Assuming yes for "modern software engineer" vibe, but will make it toggle-able or system preference if requested, default to dark/slate).
+Images: I will look for /images in the directory. If missing, I will use placeholders or generate them.
+Proposed Changes
+Core Structure
+Framework: Next.js 14+ (App Router).
+Styling: Tailwind CSS with custom config for premium typography and colors.
+Animation: Framer Motion for shared layout traversals and scroll reveals.
+Components
+[NEW] app/layout.tsx
+Define the root layout.
+Include the global gradient background wrapper.
+Load Inter and JetBrains Mono (or similar) fonts.
+[NEW] components/ui/Navbar.tsx
+Floating or sticky top nav.
+Links: Home, Projects, About, Contact.
+Animation: layoutId on the active tab background for that "sliding pill" effect.
+[NEW] components/ui/Hero.tsx
+Large typography.
+Staggered entrance for Headline > Subtext > Buttons.
+Subtle mouse-parallax or gradient shift.
+[NEW] components/ui/Background.tsx
+A fixed z-[-1] component.
+Uses CSS/Framer Motion to drift slow gradients across the screen.
+Dependencies
+framer-motion: For all animations.
+clsx, tailwind-merge: For class handling.
+lucide-react: For icons.
+Verification Plan
+Automated Tests
+Build verification (npm run build).
+Manual Verification
+Visual Check: Open local server, verify animations are smooth (60fps), no layout shifts.
+Responsiveness: Check mobile menu behavior and font scaling.

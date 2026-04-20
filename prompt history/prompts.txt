@@ -1,0 +1,20 @@
+prompt ideas for making a website 
+look like a software developer made it using state of the art animations 
+and the images folder in directory and i want a page specifically for selling 3d prints
+ill be using neon and vercel but im just focusing on the front end right now
+
+
+
+Build a Next.js (App Router) + Tailwind website that feels like a modern software engineer
+ portfolio/product site. Use Framer Motion for animations, no gimmicks: micro-interactions,
+  scroll reveals, hover states, smooth page transitions, and a subtle animated gradient background.
+   Typography should be premium (Inter + a mono accent). Add a responsive navbar with active link 
+   underline animation, and a hero section with animated headline, subtext, and CTA buttons. 
+   Use images from /public/images and reference them with stable paths. Add a footer with social
+    links and a “status pill” showing Available for work / Shipping weekly. Keep components clean,
+     reusable, and production-ready.
+
+
+
+
+
