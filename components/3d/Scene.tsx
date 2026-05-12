@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import { Environment, OrbitControls, PerspectiveCamera, useProgress } from '@react-three/drei';
+import { Environment, PerspectiveCamera, useProgress } from '@react-three/drei';
 import { Suspense } from 'react';
 
 interface SceneProps {
@@ -20,7 +20,6 @@ function LoadingOverlay() {
                 <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500">
                     Loading Model
                 </p>
-                {/* Progress bar */}
                 <div className="w-48 h-px bg-zinc-900 overflow-hidden">
                     <div
                         className="h-full bg-white transition-all duration-200 ease-out"
@@ -37,15 +36,21 @@ function LoadingOverlay() {
 
 export function Scene({ children }: SceneProps) {
     return (
-        <div className="relative h-screen w-full bg-zinc-950">
-            {/* Progress overlay — visible outside the Canvas */}
+        <div
+            className="relative h-full w-full bg-zinc-950"
+            // Allow the browser to handle vertical scroll even over the canvas
+            style={{ touchAction: 'pan-y' }}
+        >
             <LoadingOverlay />
 
             <Canvas
-                // Cap pixel ratio at 1.5× — prevents 3× rendering on Retina/high-DPI screens
                 dpr={[1, 1.5]}
-                // Disable shadow map — no shadow receivers in scene, just overhead
                 shadows={false}
+                // Override R3F's default `touch-action: none` so mobile can still scroll
+                style={{ touchAction: 'pan-y' }}
+                onCreated={({ gl }) => {
+                    gl.domElement.style.touchAction = 'pan-y';
+                }}
             >
                 <Suspense fallback={null}>
                     <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={50} />
@@ -55,19 +60,13 @@ export function Scene({ children }: SceneProps) {
                     <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} />
                     <pointLight position={[-10, -10, -10]} intensity={0.5} />
 
-                    {/* Environment for realistic reflections */}
+                    {/* Environment for reflections */}
                     <Environment preset="city" />
 
-                    {/* Rotation is handled by Model's useFrame — autoRotate removed to avoid conflict */}
-                    <OrbitControls
-                        enableZoom={false}
-                        enablePan={false}
-                        enableRotate={false}
-                        minPolarAngle={Math.PI / 4}
-                        maxPolarAngle={Math.PI / 1.5}
-                        minDistance={5}
-                        maxDistance={5}
-                    />
+                    {/* OrbitControls intentionally removed:
+                        - All controls (zoom/pan/rotate) were disabled anyway
+                        - Model rotation is handled by useFrame in Model.tsx
+                        - OrbitControls was intercepting touch events and blocking page scroll */}
 
                     {children}
                 </Suspense>
