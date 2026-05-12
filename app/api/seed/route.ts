@@ -3,15 +3,17 @@ import { NextResponse } from 'next/server';
 import { FALLBACK_PRODUCTS } from '@/lib/db';
 
 export async function GET() {
-  if (!process.env.DATABASE_URL) {
+  const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+
+  if (!dbUrl) {
     return NextResponse.json(
-      { error: 'DATABASE_URL is not set. Database not connected.' },
+      { error: 'Neither POSTGRES_URL nor DATABASE_URL is set in Vercel. Please check your Storage tab.' },
       { status: 500 }
     );
   }
 
   try {
-    const sql = neon(process.env.DATABASE_URL);
+    const sql = neon(dbUrl);
 
     // 1. Create the table
     await sql`

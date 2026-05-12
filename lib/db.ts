@@ -49,10 +49,12 @@ export const FALLBACK_PRODUCTS: Product[] = [
 
 // Reusable function to fetch products
 export async function getProducts(): Promise<Product[]> {
-  // Use Neon if DATABASE_URL is configured
-  if (process.env.DATABASE_URL) {
+  const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+
+  // Use Neon if a database URL is configured
+  if (dbUrl) {
     try {
-      const sql = neon(process.env.DATABASE_URL);
+      const sql = neon(dbUrl);
       const rows = await sql`SELECT * FROM products ORDER BY price DESC`;
       
       // Parse the JSON features array from Postgres
