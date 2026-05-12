@@ -7,32 +7,14 @@ const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null;
 
-const products = [
-  {
-    id: 'berserk',
-    name: 'Berserk – The Black Swordsman',
-    description: 'Premium 3D-printed Guts figurine. Hand-finished with industrial-grade resin and matte black coating.',
-    price: 12999, // $129.99
-  },
-  {
-    id: 'ironman',
-    name: 'Iron Man – The Armored Avenger',
-    description: 'Premium 3D-printed Iron Man figurine. Arc reactor LED detail with metallic gold & crimson finish.',
-    price: 11999, // $119.99
-  },
-  {
-    id: 'drone',
-    name: 'V-9 Scout Drone – Autonomous Recon',
-    description: 'Premium 3D-printed V-9 Scout Drone model. Stealth composite finish with articulated rotors.',
-    price: 8999,  // $89.99
-  },
-];
+import { getProducts } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { productId } = body;
 
+    const products = await getProducts();
     const product = products.find((p) => p.id === productId);
 
     if (!product) {
@@ -53,7 +35,8 @@ export async function POST(request: NextRequest) {
               name: product.name,
               description: product.description,
             },
-            unit_amount: product.price,
+            // Ensure price is converted to cents for Stripe
+            unit_amount: Math.round(product.price * 100),
           },
           quantity: 1,
         },

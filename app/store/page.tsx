@@ -11,41 +11,7 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null;
 
-const products = [
-  {
-    id: 'berserk',
-    name: 'The Black Swordsman',
-    character: 'Guts',
-    series: 'Berserk',
-    price: 129.99,
-    description:
-      'Premium 3D-printed Guts figurine. Hand-finished with industrial-grade resin and matte black coating. Every scar, every sinew — faithfully forged.',
-    image: '/images/jakub-zerdzicki-4WwBMdcq-14-unsplash.jpg',
-    features: ['Industrial Resin', 'Hand-Finished', 'Limited Edition'],
-  },
-  {
-    id: 'ironman',
-    name: 'The Armored Avenger',
-    character: 'Tony Stark',
-    series: 'Marvel Universe',
-    price: 119.99,
-    description:
-      'Premium 3D-printed Iron Man figurine. Arc reactor LED detail with metallic gold & crimson finish. Stark Industries engineering at its finest.',
-    image: '/images/jakub-zerdzicki-AR8vAAw8kv8-unsplash.jpg',
-    features: ['LED Detail', 'Metallic Finish', 'Collector\'s Item'],
-  },
-  {
-    id: 'drone',
-    name: 'V-9 Scout Drone',
-    character: 'Autonomous Recon',
-    series: 'Future Warfare',
-    price: 89.99,
-    description:
-      'Premium 3D-printed V-9 Scout Drone model. Stealth composite finish with articulated rotors. The silent eye of the battlefield, on your shelf.',
-    image: '/images/karl-hornfeldt-pikP0UyB7I0-unsplash.jpg',
-    features: ['Articulated Parts', 'Stealth Finish', 'Display Ready'],
-  },
-];
+import type { Product } from '@/lib/db';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -66,6 +32,22 @@ const itemVariants = {
 
 export default function StorePage() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch products on mount
+  useState(() => {
+    fetch('/api/products')
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch products:', err);
+        setIsLoading(false);
+      });
+  });
 
   const handleCheckout = async (productId: string) => {
     if (!stripePromise) {
@@ -167,19 +149,26 @@ export default function StorePage() {
       </section>
 
       {/* Product Grid */}
-      <section className="px-6 md:px-12 lg:px-24 py-8 md:py-12">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
-        >
-          {products.map((product) => (
-            <motion.div
-              key={product.id}
-              variants={itemVariants}
-              className="group relative border border-zinc-900 bg-zinc-950/50 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-zinc-700"
-            >
+      <section className="px-6 md:px-12 lg:px-24 py-8 md:py-12 min-h-[50vh]">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <p className="font-mono text-zinc-500 uppercase tracking-widest text-sm animate-pulse">
+              Loading Forge Inventory...
+            </p>
+          </div>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
+          >
+            {products.map((product) => (
+              <motion.div
+                key={product.id}
+                variants={itemVariants}
+                className="group relative border border-zinc-900 bg-zinc-950/50 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-zinc-700"
+              >
               {/* Product Image */}
               <div className="relative aspect-[4/5] overflow-hidden bg-zinc-950">
                 <Image
@@ -269,9 +258,10 @@ export default function StorePage() {
                   </button>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </section>
 
       {/* Bottom info */}
