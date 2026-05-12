@@ -120,24 +120,13 @@ export default function StorePage() {
           <h1 className="font-mono text-[10px] uppercase tracking-[0.3em] text-zinc-500 mb-4 md:mb-6">
             FrostForge — Premium Collection
           </h1>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div className="space-y-1">
+          <div className="space-y-1">
               <p className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9]">
                 THE FORGE
               </p>
               <p className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-zinc-600 leading-[0.9]">
                 SHOP
               </p>
-            </div>
-            {/* Price callout — inline on mobile, stays in flow */}
-            <div className="border border-zinc-800 bg-zinc-950/80 backdrop-blur-sm px-5 py-3 md:px-6 md:py-4 self-start sm:self-end">
-              <p className="font-mono text-[10px] text-zinc-600 uppercase tracking-widest mb-1">
-                Starting At
-              </p>
-              <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                $89<span className="text-base md:text-lg text-zinc-500">.99</span>
-              </p>
-            </div>
           </div>
           <p className="mt-6 max-w-lg text-zinc-500 text-sm leading-relaxed">
             Each piece is precision-engineered and hand-finished in our Frostburg, MD workshop.
