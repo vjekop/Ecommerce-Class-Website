@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Product } from '@/lib/db';
-import { Plus, Trash2, Edit2, Save, X, Lock } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Lock, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminPage() {
@@ -81,17 +81,37 @@ export default function AdminPage() {
     }
   };
 
+  const handleReSeed = async () => {
+    if (!confirm('This will RESET the database to defaults. All custom changes will be lost. Continue?')) return;
+    
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/seed');
+      if (res.ok) {
+        alert('Database reset to defaults!');
+        fetchProducts();
+      } else {
+        alert('Failed to re-seed.');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const openEdit = (product: Product) => {
     setCurrentForm({
       ...product,
-      features: product.features.join(', ') as any // Convert array to comma string for editing
+      features: Array.isArray(product.features) ? product.features.join(', ') as any : product.features
     });
     setIsEditing(true);
   };
 
   const openCreate = () => {
     setCurrentForm({
-      id: '', name: '', character: '', series: '', price: 0, description: '', image: '/images/', features: [] as any
+      id: '', name: '', character: '', series: '', price: 0, description: '', image: '/images/', features: [] as any,
+      model_path: '/models/berserk.glb', model_scale: 1.0
     });
     setIsEditing(false);
   };
@@ -125,7 +145,13 @@ export default function AdminPage() {
             <h1 className="text-3xl font-bold tracking-tighter uppercase mb-2">Inventory Management</h1>
             <p className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Connected to Neon PostgreSQL</p>
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
+             <button onClick={() => setIsAuthenticated(false)} className="border border-zinc-800 text-zinc-500 font-mono text-[10px] uppercase tracking-widest px-4 py-2 hover:text-white transition-colors">
+              Logout
+            </button>
+             <button onClick={handleReSeed} className="flex items-center gap-2 border border-red-900/30 text-red-500 font-mono text-[10px] uppercase tracking-widest px-4 py-2 hover:bg-red-950/20 transition-all">
+              <RefreshCw className="w-3 h-3" /> Reset Defaults
+            </button>
              <Link href="/store" className="border border-zinc-800 text-zinc-400 font-mono text-[10px] uppercase tracking-widest px-4 py-2 hover:text-white transition-colors">
               View Store
             </Link>
@@ -136,11 +162,11 @@ export default function AdminPage() {
         </div>
 
         {currentForm.id !== undefined && (
-          <form onSubmit={handleSave} className="border border-zinc-800 bg-zinc-950 p-6 md:p-8 mb-12 grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+          <form onSubmit={handleSave} className="border border-zinc-800 bg-zinc-950 p-6 md:p-8 mb-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
             <button type="button" onClick={() => setCurrentForm({})} className="absolute top-4 right-4 text-zinc-500 hover:text-white">
               <X className="w-5 h-5" />
             </button>
-            <h2 className="md:col-span-2 font-mono text-xs uppercase tracking-widest text-zinc-400 mb-2 border-b border-zinc-800 pb-4">
+            <h2 className="md:col-span-2 lg:col-span-3 font-mono text-xs uppercase tracking-widest text-zinc-400 mb-2 border-b border-zinc-800 pb-4">
               {isEditing ? 'Edit Product' : 'Create New Product'}
             </h2>
             
@@ -174,17 +200,27 @@ export default function AdminPage() {
               <input required value={currentForm.image || ''} onChange={e => setCurrentForm({...currentForm, image: e.target.value})} className="w-full bg-black border border-zinc-800 p-2 text-sm focus:border-zinc-500 focus:outline-none" />
             </div>
 
-            <div className="md:col-span-2 space-y-1">
-              <label className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Features (Comma Separated)</label>
-              <input required value={currentForm.features as any || ''} onChange={e => setCurrentForm({...currentForm, features: e.target.value as any})} className="w-full bg-black border border-zinc-800 p-2 text-sm focus:border-zinc-500 focus:outline-none" placeholder="e.g. LED Detail, Hand Painted, Limited Edition" />
+            <div className="space-y-1">
+              <label className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest text-zinc-300">3D Model Path (.glb)</label>
+              <input required value={currentForm.model_path || ''} onChange={e => setCurrentForm({...currentForm, model_path: e.target.value})} className="w-full bg-black border border-zinc-700 p-2 text-sm focus:border-white focus:outline-none" placeholder="/models/berserk.glb" />
             </div>
 
-            <div className="md:col-span-2 space-y-1">
+            <div className="space-y-1">
+              <label className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest text-zinc-300">3D Model Scale</label>
+              <input required type="number" step="0.1" value={currentForm.model_scale || 1.0} onChange={e => setCurrentForm({...currentForm, model_scale: parseFloat(e.target.value)})} className="w-full bg-black border border-zinc-700 p-2 text-sm focus:border-white focus:outline-none" />
+            </div>
+
+            <div className="md:col-span-2 lg:col-span-1 space-y-1">
+              <label className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Features (Comma Separated)</label>
+              <input required value={currentForm.features as any || ''} onChange={e => setCurrentForm({...currentForm, features: e.target.value as any})} className="w-full bg-black border border-zinc-800 p-2 text-sm focus:border-zinc-500 focus:outline-none" placeholder="LED Detail, Hand Painted" />
+            </div>
+
+            <div className="md:col-span-2 lg:col-span-3 space-y-1">
               <label className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Description</label>
               <textarea required value={currentForm.description || ''} onChange={e => setCurrentForm({...currentForm, description: e.target.value})} className="w-full bg-black border border-zinc-800 p-2 text-sm focus:border-zinc-500 focus:outline-none h-24 resize-none" />
             </div>
 
-            <div className="md:col-span-2 pt-4">
+            <div className="md:col-span-2 lg:col-span-3 pt-4">
               <button type="submit" className="flex items-center justify-center gap-2 w-full bg-white text-black font-mono text-xs font-bold uppercase tracking-widest p-4 hover:bg-zinc-200 transition-colors">
                 <Save className="w-4 h-4" /> Save to Database
               </button>
@@ -199,20 +235,22 @@ export default function AdminPage() {
                 <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-zinc-500 font-normal">ID</th>
                 <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-zinc-500 font-normal">Name</th>
                 <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-zinc-500 font-normal">Price</th>
+                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-zinc-500 font-normal">3D Model</th>
                 <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-zinc-500 font-normal text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={4} className="p-8 text-center text-zinc-500 font-mono text-xs">Loading Database...</td></tr>
+                <tr><td colSpan={5} className="p-8 text-center text-zinc-500 font-mono text-xs">Loading Database...</td></tr>
               ) : products.length === 0 ? (
-                <tr><td colSpan={4} className="p-8 text-center text-zinc-500 font-mono text-xs">No products found.</td></tr>
+                <tr><td colSpan={5} className="p-8 text-center text-zinc-500 font-mono text-xs">No products found.</td></tr>
               ) : (
                 products.map((product) => (
                   <tr key={product.id} className="border-b border-zinc-900 hover:bg-zinc-950/50 transition-colors">
                     <td className="p-4 font-mono text-xs text-zinc-400">{product.id}</td>
                     <td className="p-4 font-bold">{product.name}</td>
                     <td className="p-4 font-mono text-xs text-zinc-300">${product.price.toFixed(2)}</td>
+                    <td className="p-4 font-mono text-[10px] text-zinc-500 truncate max-w-[150px]">{product.model_path}</td>
                     <td className="p-4 flex justify-end gap-2">
                       <button onClick={() => openEdit(product)} className="p-2 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 transition-all bg-black">
                         <Edit2 className="w-3 h-3" />

@@ -15,7 +15,7 @@ export async function GET() {
   try {
     const sql = neon(dbUrl);
 
-    // 1. Create the table
+    // 1. Create/Update the table with model columns
     await sql`
       CREATE TABLE IF NOT EXISTS products (
         id VARCHAR(50) PRIMARY KEY,
@@ -25,9 +25,19 @@ export async function GET() {
         price NUMERIC(10, 2) NOT NULL,
         description TEXT NOT NULL,
         image VARCHAR(255) NOT NULL,
-        features JSONB NOT NULL
+        features JSONB NOT NULL,
+        model_path VARCHAR(255) DEFAULT '/models/berserk.glb',
+        model_scale NUMERIC(4, 2) DEFAULT 1.0
       );
     `;
+
+    // Ensure columns exist (in case table was already created)
+    try {
+      await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS model_path VARCHAR(255) DEFAULT '/models/berserk.glb'`;
+      await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS model_scale NUMERIC(4, 2) DEFAULT 1.0`;
+    } catch (e) {
+      // Columns might already exist, ignore
+    }
 
     // 2. Clear existing data to avoid duplicates on re-seed
     await sql`TRUNCATE TABLE products`;
@@ -35,7 +45,7 @@ export async function GET() {
     // 3. Insert the fallback products into the database
     for (const product of FALLBACK_PRODUCTS) {
       await sql`
-        INSERT INTO products (id, name, character, series, price, description, image, features)
+        INSERT INTO products (id, name, character, series, price, description, image, features, model_path, model_scale)
         VALUES (
           ${product.id}, 
           ${product.name}, 
@@ -44,12 +54,14 @@ export async function GET() {
           ${product.price}, 
           ${product.description}, 
           ${product.image}, 
-          ${JSON.stringify(product.features)}::jsonb
+          ${JSON.stringify(product.features)}::jsonb,
+          ${product.model_path},
+          ${product.model_scale}
         )
       `;
     }
 
-    return NextResponse.json({ message: 'Database seeded successfully with 3 products!' });
+    return NextResponse.json({ message: 'Database seeded successfully with 3 products and model paths!' });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

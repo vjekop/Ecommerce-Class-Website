@@ -12,16 +12,15 @@ export async function POST(req: Request) {
   try {
     const sql = getDb();
     const body = await req.json();
-    const { id, name, character, series, price, description, image, features } = body;
+    const { id, name, character, series, price, description, image, features, model_path, model_scale } = body;
     
-    // Ensure features is an array (if user types comma separated string)
     const featuresArray = Array.isArray(features) 
       ? features 
       : (typeof features === 'string' ? features.split(',').map((f: string) => f.trim()) : []);
 
     await sql`
-      INSERT INTO products (id, name, character, series, price, description, image, features)
-      VALUES (${id}, ${name}, ${character}, ${series}, ${price}, ${description}, ${image}, ${JSON.stringify(featuresArray)}::jsonb)
+      INSERT INTO products (id, name, character, series, price, description, image, features, model_path, model_scale)
+      VALUES (${id}, ${name}, ${character}, ${series}, ${price}, ${description}, ${image}, ${JSON.stringify(featuresArray)}::jsonb, ${model_path}, ${model_scale})
     `;
     return NextResponse.json({ success: true });
   } catch (e: any) {
@@ -34,7 +33,7 @@ export async function PUT(req: Request) {
   try {
     const sql = getDb();
     const body = await req.json();
-    const { id, name, character, series, price, description, image, features } = body;
+    const { id, name, character, series, price, description, image, features, model_path, model_scale } = body;
     
     const featuresArray = Array.isArray(features) 
       ? features 
@@ -42,7 +41,15 @@ export async function PUT(req: Request) {
 
     await sql`
       UPDATE products 
-      SET name = ${name}, character = ${character}, series = ${series}, price = ${price}, description = ${description}, image = ${image}, features = ${JSON.stringify(featuresArray)}::jsonb
+      SET name = ${name}, 
+          character = ${character}, 
+          series = ${series}, 
+          price = ${price}, 
+          description = ${description}, 
+          image = ${image}, 
+          features = ${JSON.stringify(featuresArray)}::jsonb,
+          model_path = ${model_path},
+          model_scale = ${model_scale}
       WHERE id = ${id}
     `;
     return NextResponse.json({ success: true });
