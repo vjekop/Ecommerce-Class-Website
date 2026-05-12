@@ -2,7 +2,7 @@
 
 import { Hero } from '@/components/ui/Hero';
 import { Scene } from '@/components/3d/Scene';
-import { Model } from '@/components/3d/Model';
+import { Model, preloadModel } from '@/components/3d/Model';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -84,6 +84,9 @@ export default function Home() {
             <button
               key={model.name}
               onClick={() => setCurrentModel(model)}
+              // Preload the GLB in the background as soon as the user hovers,
+              // so it's ready (or mostly ready) by the time they click.
+              onMouseEnter={() => preloadModel(model.path)}
               className={cn(
                 "px-4 py-3 text-right text-xs font-mono font-bold uppercase tracking-widest transition-all",
                 currentModel.name === model.name

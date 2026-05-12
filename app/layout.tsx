@@ -16,8 +16,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Portfolio | Modern Software Engineer',
-  description: 'A showcase of my work and experience.',
+  title: 'FrostForge | Bespoke 3D Fabrication — Frostburg, MD',
+  description: 'Premium custom 3D-printed figurines, hand-finished in Frostburg, Maryland. Shop limited-edition pieces from Berserk, Marvel, and more.',
 };
 
 import { Background } from '@/components/ui/Background';
