@@ -58,4 +58,4 @@ We utilized AI as a senior-level technical partner to handle complex optimizatio
 **Solution:** Built a dual-variable environment check (`POSTGRES_URL` + `DATABASE_URL`) with a static JSON fallback so the site stays live even during database maintenance.
 
 ---
-*FrostForge Project Documentation - Spring 2024*
+*FrostForge Project Documentation - Spring 2026*
